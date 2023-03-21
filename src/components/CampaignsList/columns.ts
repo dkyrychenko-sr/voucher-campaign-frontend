@@ -1,4 +1,4 @@
-import { IColumnFields } from '../Table'
+import { IColumnFields } from '../shared/Table'
 
 export const columns: IColumnFields[] = [
   {

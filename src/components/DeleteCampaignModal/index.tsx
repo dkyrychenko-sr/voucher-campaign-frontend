@@ -1,5 +1,8 @@
+import React from 'react'
+
 import { ICampaign } from '@/interfaces/campaign.interface'
-import Modal from '../Modal'
+
+import Modal from '../shared/Modal'
 
 interface IDeleteCampaignModalProps {
   campaign: ICampaign

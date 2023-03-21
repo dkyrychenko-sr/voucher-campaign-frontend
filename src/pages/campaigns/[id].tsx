@@ -1,35 +1,24 @@
+import React from 'react'
+
+import { getCampaignById, getCampaigns } from '@/api/campaigns'
 import Campaign from '@/components/Campaign'
-import { ICampaign } from '@/interfaces/campaign.interface'
+import { ICampaign } from '@/interfaces'
 
 export async function getStaticPaths() {
-  return {
-    paths: [{ params: { id: '1' } }, { params: { id: '2' } }],
-    fallback: false,
-  }
+  const campaigns = await getCampaigns()
+  const paths = campaigns.map((campaign: ICampaign) => ({
+    params: { id: `${campaign.id}` },
+  }))
+
+  return { paths, fallback: false }
 }
 
-export async function getStaticProps() {
-  return {
-    props: { campaign },
-  }
+export async function getStaticProps({ params }) {
+  const campaign = await getCampaignById(params.id)
+
+  return { props: { campaign } }
 }
 
-const campaign: ICampaign = {
-  id: '1',
-  name: 'Winter Holidays 10$',
-  dateFrom: '2023-03-25',
-  dateTo: '2023-05-25',
-  amount: '10',
-  currency: '$',
-  vouchers: [
-    {
-      id: '1',
-      code: 'RECHARGE-GVBSHF',
-    },
-  ],
-  discount: '10$',
-}
-
-export default function CampaignPage() {
+export default function CampaignPage({ campaign }: { campaign: ICampaign }) {
   return <Campaign campaign={campaign} />
 }

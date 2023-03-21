@@ -1,16 +1,24 @@
-import { getRowForVouchersTable, processCampaignItemData } from '@/utils/table'
+import { useRouter } from 'next/router'
+import React from 'react'
 import { useCallback, useEffect, useState } from 'react'
-import Spinner from '../Spinner'
-import TableComponent from '../Table'
-import { columns } from './columns'
 import { CSVLink } from 'react-csv'
+
+import { deleteCampaignById, generateVouchers } from '@/api/campaigns'
+import { ICampaign, IVoucher } from '@/interfaces'
 import { prepareVouchersForCSVExport } from '@/utils/csv'
-import BackNavButton from '../BackNavButton'
-import { ICampaign } from '@/interfaces'
-import DeleteCampaignModal from '../DeleteCampaignModal'
+import { processCampaignItemData } from '@/utils/table'
+
 import CreateVouchersModal from '../CreateVouchersModal'
+import DeleteCampaignModal from '../DeleteCampaignModal'
+import BackNavButton from '../shared/BackNavButton'
+import Spinner from '../shared/Spinner'
+import TableComponent from '../shared/Table'
+import Toast from '../shared/Toast'
+import { columns } from './columns'
 
 export default function Campaign({ campaign }: { campaign: ICampaign }) {
+  const router = useRouter()
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isGenerateVouchersModalOpen, setIsGenerateVouchersModalOpen] =
     useState(false)
@@ -41,11 +49,35 @@ export default function Campaign({ campaign }: { campaign: ICampaign }) {
   }, [])
 
   const onSubmitDeleteCampaign = useCallback(() => {
-    console.log('deleting campaign')
+    deleteCampaignById(campaign.id)
+      .then(() => {
+        router.push('/campaigns')
+      })
+      .catch((error) => {
+        setToastMessage(error.message)
+      })
+  }, [campaign.id, router])
+
+  const onSubmitGeneratingVouchersModal = useCallback(
+    (values: { [key: string]: string }) => {
+      generateVouchers(campaign.id, +values.vouchersAmount)
+        .then(() => {
+          router.reload()
+        })
+        .catch((error) => {
+          setToastMessage(error.message)
+        })
+    },
+    [campaign.id, router]
+  )
+
+  const onHideToast = useCallback(() => {
+    setToastMessage(null)
   }, [])
 
-  const onSubmitGeneratingVouchersModal = useCallback(() => {
-    console.log('generating vouchers')
+  const copyToClipboard = useCallback((code: string) => {
+    navigator.clipboard.writeText(code)
+    setToastMessage('Copied to clipboard')
   }, [])
 
   if (!campaignData) return <Spinner />
@@ -97,11 +129,30 @@ export default function Campaign({ campaign }: { campaign: ICampaign }) {
           </div>
         </div>
         {campaignData.vouchers.length > 0 && (
-          <TableComponent columns={columns}>
-            {campaignData.vouchers.map((voucher: any) =>
-              getRowForVouchersTable(columns, voucher)
-            )}
-          </TableComponent>
+          <>
+            <p className="font-semibold text-black mb-6">
+              {campaignData.vouchers.length} Voucher(s) in Campaign
+            </p>
+            <TableComponent columns={columns}>
+              {campaignData.vouchers.map((voucher: IVoucher) => (
+                <tr
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                  key={voucher.code}
+                >
+                  <td className="px-6 py-4">
+                    <button
+                      className="underline text-blue-500"
+                      onClick={() => {
+                        copyToClipboard(voucher.code)
+                      }}
+                    >
+                      {voucher.code}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </TableComponent>
+          </>
         )}
       </div>
       <DeleteCampaignModal
@@ -116,6 +167,9 @@ export default function Campaign({ campaign }: { campaign: ICampaign }) {
         onClose={closeGenerateVouchersModal}
         onSubmit={onSubmitGeneratingVouchersModal}
       />
+      {toastMessage && (
+        <Toast message={toastMessage} onHideToast={onHideToast} />
+      )}
     </>
   )
 }

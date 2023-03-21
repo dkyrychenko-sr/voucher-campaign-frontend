@@ -6,6 +6,7 @@ export interface ICampaign {
   dateFrom: string
   dateTo: string
   amount: string
+  prefix: string
   currency: string
   vouchers: IVoucher[]
   hasVouchers?: string

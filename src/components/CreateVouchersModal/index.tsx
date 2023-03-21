@@ -1,13 +1,16 @@
-import { ICampaign } from '@/interfaces/campaign.interface'
+import React from 'react'
 import { useForm } from 'react-hook-form'
+
+import { ICampaign } from '@/interfaces/campaign.interface'
+
 import ErrorMessage from '../CreateCampaign/ErrorMessage'
-import Modal from '../Modal'
+import Modal from '../shared/Modal'
 
 interface ICreateVouchersModalProps {
   campaign: ICampaign
   isOpen: boolean
   onClose: () => void
-  onSubmit: () => void
+  onSubmit: (values: { [key: string]: string }) => void
 }
 
 export default function CreateVouchersModal({

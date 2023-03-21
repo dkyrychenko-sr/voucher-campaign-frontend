@@ -1,4 +1,18 @@
-export default function Toast({ message }: { message: string }) {
+import React, { useLayoutEffect } from 'react'
+
+interface IToastProps {
+  message: string
+  onHideToast: () => void
+}
+
+export default function Toast({ message, onHideToast }: IToastProps) {
+  useLayoutEffect(() => {
+    setTimeout(function () {
+      // hide toast after 5 seconds
+      onHideToast()
+    }, 5000)
+  }, [onHideToast])
+
   return (
     <div
       id="toast-simple"

@@ -1,17 +1,26 @@
+import React from 'react'
+import { useEffect, useState } from 'react'
+
 import { ICampaign } from '@/interfaces'
 import {
   getCellForCampaignTable,
   processDataForCampaignsTable,
 } from '@/utils/table'
-import { useState } from 'react'
-import TableComponent from '../Table'
-import { columns } from './columns'
-import { data } from './mockData'
 
-export default function CampaignsList() {
-  const [tableData, setTableData] = useState<ICampaign[]>(
-    processDataForCampaignsTable(data)
-  )
+import TableComponent from '../shared/Table'
+import { columns } from './columns'
+
+export default function CampaignsList({
+  campaigns,
+}: {
+  campaigns: ICampaign[]
+}) {
+  const [tableData, setTableData] = useState<ICampaign[]>([])
+
+  useEffect(() => {
+    if (campaigns) setTableData(processDataForCampaignsTable(campaigns))
+  }, [campaigns])
+
   return (
     <div className="p-8">
       <div className="flex justify-between mb-5">
@@ -24,11 +33,15 @@ export default function CampaignsList() {
         </a>
       </div>
       <TableComponent columns={columns}>
-        {tableData.map((item: any) => (
-          <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {tableData.map((campaign: { [key: string]: any }) => (
+          <tr
+            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+            key={campaign.id}
+          >
             {columns.map((column) => (
-              <td className="px-6 py-4">
-                {getCellForCampaignTable(column.id, item[column.id])}
+              <td className="px-6 py-4" key={`${column.id}-${campaign.id}`}>
+                {getCellForCampaignTable(column.id, campaign)}
               </td>
             ))}
           </tr>

@@ -1,16 +1,8 @@
-import { IColumnFields } from '../Table'
+import { IColumnFields } from '../shared/Table'
 
 export const columns: IColumnFields[] = [
   {
-    id: 'id',
-    name: 'ID',
-  },
-  {
     id: 'code',
     name: 'Discount code',
-  },
-  {
-    id: 'clipboard',
-    name: '',
   },
 ]
