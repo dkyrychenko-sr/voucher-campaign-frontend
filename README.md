@@ -30,4 +30,4 @@ npm run test
 
 ## Backend
 
-You'll need to setup the backend repo as well to get it running smoothly. Please visit (link) to see steps to setup Backend
+You'll need to setup the backend repo as well to get it running smoothly. Please visit [backend repo](https://github.com/dkyrychenko-sr/voucher-campaign-backend) to check setup steps
